@@ -9,7 +9,7 @@
 import Cocoa
 import WebKit
 
-class ViewController: NSViewController, WKNavigationDelegate {
+class ViewController: NSViewController, WKNavigationDelegate, NSGestureRecognizerDelegate {
 
     // MARK: - Variables
     var rows: NSStackView!
@@ -54,15 +54,20 @@ class ViewController: NSViewController, WKNavigationDelegate {
         webView.load(URLRequest(url: URL(string: "https://www.apple.com")!))
         
         let recognizer = NSClickGestureRecognizer(target: self, action: #selector(webViewClicked))
-        recognizer.numberOfClicksRequired = 2
+        recognizer.delegate = self
+        //recognizer.numberOfClicksRequired = 2
         webView.addGestureRecognizer(recognizer)
+        
+        if selectedWebView == nil {
+            select(webView: webView)
+        }
         
         return webView
     }
     
     func select(webView: WKWebView) {
         selectedWebView = webView
-        selectedWebView.layer?.borderWidth = 4
+        selectedWebView.layer?.borderWidth = 2
         selectedWebView.layer?.borderColor = NSColor.blue.cgColor
     }
     
@@ -79,6 +84,14 @@ class ViewController: NSViewController, WKNavigationDelegate {
         
         // select the new one
         select(webView: newSelectedWebView)
+    }
+    
+    func gestureRecognizer(_ gestureRecognizer: NSGestureRecognizer, shouldAttemptToRecognizeWith event: NSEvent) -> Bool {
+        if gestureRecognizer.view == selectedWebView {
+            return false
+        } else {
+            return true
+        }
     }
 
     // MARK: - IBActions
